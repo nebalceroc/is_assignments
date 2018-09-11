@@ -2,6 +2,7 @@ from graphviz import Graph, Digraph
 from IPython.display import display
 import search
 import util
+import os
 '''
 This variables MUST not be changed.
 They represent the movements of the masterball.
@@ -149,8 +150,7 @@ def general_search(problem, frontier):
                 tree.addNode(str(v) + str(actions+[action]), str(v))
                 tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
                 frontier.push((v, actions + [action], path_cost + cost))
-        else:
-            print("ALREADY VISITED")
+
         visited[u] = 'black'
     return [], tree
 
@@ -175,21 +175,21 @@ def myHeuristic(state):
             i+=1
     return error_count
 
-#problem = MasterballProblem(( (0, 4, 3, 2, 1, 5, 6, 7),
-#                              (0, 3, 2, 1, 0, 5, 6, 7),
-#                              (7, 4, 3, 2, 1, 4, 5, 6),
-#s                              (0, 4, 3, 2, 1, 5, 6, 7)))
+#problem = MasterballProblem((((5, 1, 4, 6, 7, 0, 3, 2), (0, 5, 3, 7, 6, 1, 2, 4), (0, 6, 7, 1, 4, 3, 5, 2), (4, 5, 3, 2, 0, 6, 7, 1)))
 
-problem = MasterballProblem(((5, 7, 2, 1, 4, 0, 6, 3),
-(1, 0, 3, 2, 5, 4, 7, 6),
-(5, 1, 2, 6, 4, 3, 0, 7),
-(1, 0, 3, 2, 5, 4, 7, 6)
-))
+
+#print(myHeuristic(problem.getStartState()))
+# problem = MasterballProblem(((5, 7, 2, 1, 4, 0, 6, 3),
+# (1, 0, 3, 2, 5, 4, 7, 6),
+# (5, 1, 2, 6, 4, 3, 0, 7),
+# (1, 0, 3, 2, 5, 4, 7, 6)
+# ))
 #problem = MasterballProblem(( (0, 1, 2, 3, 4, 5, 6, 7),
 #                              (0, 1, 2, 3, 4, 5, 6, 7),
 #                              (0, 1, 2, 3, 4, 5, 6, 7),
 #                              (0, 1, 2, 3, 4, 5, 6, 7)))
 
+#print(aStarSearch(problem, myHeuristic)[0])
 #for l in problem.getStartState():
 #    print(l)
 
@@ -205,4 +205,8 @@ problem = MasterballProblem(((5, 7, 2, 1, 4, 0, 6, 3),
 #print(suc)
 
 #print(iterativeDeepeningSearch(problem))
-print(aStarSearch(problem, myHeuristic)[0])
+# file = open("states.txt", "r")
+# for line in file:
+#     problem = MasterballProblem(tuple(line.split(",")))
+#     a, t = aStarSearch(problem, myHeuristic)
+#     print(str(len(a)) + " " + str(a) + " " + str(problem.getStartState()))

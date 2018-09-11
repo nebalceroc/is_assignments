@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 from graphviz import Graph, Digraph
 from IPython.display import display
+import util
 
 class search_tree():
     def __init__(self):
@@ -62,8 +63,6 @@ def general_search(problem, frontier):
                 frontier.push((v, actions + [action], path_cost + cost))
         visited[u] = 'black'
     return [], tree
-
-import util
 
 class SearchProblem:
     """
@@ -154,8 +153,9 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def f_cost(item):
+        return item[2] + heuristic(item[0])
+    return general_search(problem, util.PriorityQueueWithFunction(f_cost))
 
 # Abbreviations
 bfs = breadthFirstSearch

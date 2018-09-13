@@ -9,7 +9,7 @@ solved_problem = MasterballProblem(( (0, 1, 2, 3, 4, 5, 6, 7),
                               (0, 1, 2, 3, 4, 5, 6, 7)))
 
 action_limit = 10
-required_states = 5
+required_states = 1
 
 generated_states = []
 for s in range(required_states):
@@ -34,6 +34,8 @@ for s in generated_states:
     #file.write(str(s[0])+"\n")
     problem = MasterballProblem(s[0])
     a, t = aStarSearch(problem, myHeuristic)
+    #b, u = iterativeDeepeningSearch(problem)
     print(str(len(a)) + " " + str(a) + " " + str(problem.getStartState()))
+    #print(str(len(b)) + " " + str(u) + " " + str(problem.getStartState()))
 
     #file.write("\n")

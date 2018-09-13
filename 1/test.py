@@ -3,6 +3,7 @@ from IPython.display import display
 import search
 import util
 import os
+import itertools
 '''
 This variables MUST not be changed.
 They represent the movements of the masterball.
@@ -22,6 +23,16 @@ V_6 = "Vertical 6"
 V_7 = "Vertical 7"
 
 actions = [R_0,R_1,R_2,R_3,V_0,V_1,V_2,V_3,V_4,V_5,V_6,V_7]
+
+def getInv(pos):
+    if pos == 0:
+        return 3
+    elif pos == 1:
+        return 2
+    elif pos == 2:
+        return 1
+    elif pos == 3:
+        return 0
 
 class MasterballProblem(search.SearchProblem):
 
@@ -44,11 +55,20 @@ class MasterballProblem(search.SearchProblem):
         Define when a given state is a goal state (A correctly colored masterball)
         '''
         ### your code here ###
-        for lat in state:
-            for idx, lon in enumerate(lat):
-                if idx != lon:
+        base_vector = []
+        i_0 = None
+        #for lat in state:
+        for idx, lat in enumerate(state):
+            i_vector = list(lat)
+            if idx == 0:
+                base_vector = list(lat)
+                try:
+                    i_0 = base_vector.index(0)
+                except:
                     return False
-
+            for i in range(1,len(i_vector)):
+                if i != i_vector[(i_0+i)%8]:
+                    return False
         return True
 
     def getStartState(self):
@@ -71,41 +91,76 @@ class MasterballProblem(search.SearchProblem):
 
         Note that you should not modify the state.
         '''
+
         self.expanded += 1
         successors = []
         ### your code here ###
         s_state = []
+        dummy_state = []
         for layer in state:
             s_state.append(list(layer))
+            dummy_state.append(list(layer))
 
         for action in actions:
             s_state = []
+            dummy_state = []
             for layer in state:
                 s_state.append(list(layer))
+                dummy_state.append(list(layer))
 
             action_type, orientation = action.split(" ")
             orientation = int(orientation)
             if action_type == "Right":
-                s_state[orientation] = [s_state[orientation][-1]] + s_state[orientation][:-1]
+                dummy_state[orientation] = [s_state[orientation][-1]] + s_state[orientation][:-1]
             elif action_type == "Vertical":
                 lat = 0
                 while lat < len(s_state):
                     aux_arr = [s_state[lat][(orientation+3)%8],s_state[lat][(orientation+2)%8],s_state[lat][(orientation+1)%8],s_state[lat][orientation]]
-                    s_state[lat][orientation] = aux_arr[0]
-                    s_state[lat][(orientation+1)%8] = aux_arr[1]
-                    s_state[lat][(orientation+2)%8] = aux_arr[2]
-                    s_state[lat][(orientation+3)%8] = aux_arr[3]
+                    dummy_state[getInv(lat)][orientation] = aux_arr[0]
+                    dummy_state[getInv(lat)][(orientation+1)%8] = aux_arr[1]
+                    dummy_state[getInv(lat)][(orientation+2)%8] = aux_arr[2]
+                    dummy_state[getInv(lat)][(orientation+3)%8] = aux_arr[3]
                     lat += 1
 
 
             tupled_layers = []
-            for layer in s_state:
+            for layer in dummy_state:
                 tupled_layers.append(tuple(layer))
 
             tupled_state = tuple(tupled_layers)
 
             successors.append(tuple((tupled_state,action,1)))
         return successors
+
+    def execute_action(self,action,state):
+        s_state = []
+        dummy_state = []
+        for layer in state:
+            s_state.append(list(layer))
+            dummy_state.append(list(layer))
+
+        action_type, orientation = action.split(" ")
+        orientation = int(orientation)
+        if action_type == "Right":
+            dummy_state[orientation] = [s_state[orientation][-1]] + s_state[orientation][:-1]
+        elif action_type == "Vertical":
+            lat = 0
+            while lat < len(s_state):
+                aux_arr = [s_state[lat][(orientation+3)%8],s_state[lat][(orientation+2)%8],s_state[lat][(orientation+1)%8],s_state[lat][orientation]]
+                dummy_state[getInv(lat)][orientation] = aux_arr[0]
+                dummy_state[getInv(lat)][(orientation+1)%8] = aux_arr[1]
+                dummy_state[getInv(lat)][(orientation+2)%8] = aux_arr[2]
+                dummy_state[getInv(lat)][(orientation+3)%8] = aux_arr[3]
+                lat += 1
+
+
+        tupled_layers = []
+        for layer in dummy_state:
+            tupled_layers.append(tuple(layer))
+
+        tupled_state = tuple(tupled_layers)
+
+        return tupled_state
 
 class search_tree():
     def __init__(self):
@@ -133,16 +188,38 @@ def graphDot(g_prob, color):
                 dot.edge(n1, n2)
     return dot
 
-def general_search(problem, frontier):
+def iterativeDeepeningSearch(problem):
+    for depth in itertools.count():
+        visited = {}
+        frontier = util.Queue()
+        state = problem.getStartState()
+        frontier.push((state, [], 0))
+        tree = search_tree()
+        tree.addNode(str(state)+"[]",str(state))
+        while not frontier.isEmpty():
+            u, actions, path_cost = frontier.pop()
+            if problem.isGoalState(u):
+                return  actions, tree
+            if not u in visited:
+                for v, action, cost in problem.getSuccessors(u):
+                    tree.addNode(str(v) + str(actions+[action]), str(v))
+                    tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
+                    if path_cost < depth:
+                        frontier.push((v, actions + [action], path_cost + cost))
+            visited[u] = 'black'
+    return [], tree
+
+def aStarSearch(problem, heuristic):
+    def f_cost(item):
+        return item[2] + heuristic(item[0])
     visited = {}
+    frontier = util.PriorityQueueWithFunction(f_cost)
     state = problem.getStartState()
     frontier.push((state, [], 0))
     tree = search_tree()
     tree.addNode(str(state)+"[]",str(state))
     while not frontier.isEmpty():
         u, actions, path_cost = frontier.pop()
-        #print(str(u)+" "+str(len(actions))+" "+str(path_cost))
-        #import pdb; pdb.set_trace()
         if problem.isGoalState(u):
             return  actions, tree
         if not u in visited:
@@ -150,19 +227,8 @@ def general_search(problem, frontier):
                 tree.addNode(str(v) + str(actions+[action]), str(v))
                 tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
                 frontier.push((v, actions + [action], path_cost + cost))
-
         visited[u] = 'black'
     return [], tree
-
-def iterativeDeepeningSearch(problem):
-    ### your code here ###
-    return []
-
-def aStarSearch(problem, heuristic):
-    ### your code here ###
-    def f_cost(item):
-        return item[2] + heuristic(item[0])
-    return general_search(problem, util.PriorityQueueWithFunction(f_cost))
 
 def myHeuristic(state):
     ### your code here ###
@@ -175,8 +241,47 @@ def myHeuristic(state):
             i+=1
     return error_count
 
-#problem = MasterballProblem((((5, 1, 4, 6, 7, 0, 3, 2), (0, 5, 3, 7, 6, 1, 2, 4), (0, 6, 7, 1, 4, 3, 5, 2), (4, 5, 3, 2, 0, 6, 7, 1)))
+def myHeuristic2(state):
+    ### your code here ###
+    error_count = 0
 
+    for idx, lat in enumerate(state):
+        for x in range(8):
+            try:
+                i_x = base_vector.index(x)
+            except:
+                return False
+            
+            if lat.count(x) == 0 or lat.count() > 1:
+                error_count=+2
+            else:
+                i = lat.index(x)
+
+    base_vector = []
+    i_0 = None
+    #for lat in state:
+    for idx, lat in enumerate(state):
+        i_vector = list(lat)
+        if idx == 0:
+            base_vector = list(lat)
+            try:
+                i_0 = base_vector.index(0)
+            except:
+                return False
+        for i in range(1,len(i_vector)):
+            if i != i_vector[(i_0+i)%8]:
+                return False
+    return True
+
+        return error_count
+
+#problem = MasterballProblem((((5, 1, 4, 6, 7, 0, 3, 2), (0, 5, 3, 7, 6, 1, 2, 4), (0, 6, 7, 1, 4, 3, 5, 2), (4, 5, 3, 2, 0, 6, 7, 1))))
+
+
+#print(problem.isGoalState(((1, 2, 3, 4, 5, 6, 7, 0),
+                            # (1, 2, 3, 4, 5, 6, 7, 0),
+                            # (0, 1, 2, 3, 4, 5, 6, 7),
+                            # (0, 1, 2, 3, 4, 5, 6, 7))))
 
 #print(myHeuristic(problem.getStartState()))
 # problem = MasterballProblem(((5, 7, 2, 1, 4, 0, 6, 3),

@@ -241,39 +241,39 @@ def myHeuristic(state):
             i+=1
     return error_count
 
-def myHeuristic2(state):
-    ### your code here ###
-    error_count = 0
-
-    for idx, lat in enumerate(state):
-        for x in range(8):
-            try:
-                i_x = base_vector.index(x)
-            except:
-                return False
-            
-            if lat.count(x) == 0 or lat.count() > 1:
-                error_count=+2
-            else:
-                i = lat.index(x)
-
-    base_vector = []
-    i_0 = None
-    #for lat in state:
-    for idx, lat in enumerate(state):
-        i_vector = list(lat)
-        if idx == 0:
-            base_vector = list(lat)
-            try:
-                i_0 = base_vector.index(0)
-            except:
-                return False
-        for i in range(1,len(i_vector)):
-            if i != i_vector[(i_0+i)%8]:
-                return False
-    return True
-
-        return error_count
+# def myHeuristic2(state):
+#     ### your code here ###
+#     error_count = 0
+#
+#     for idx, lat in enumerate(state):
+#         for x in range(8):
+#             try:
+#                 i_x = base_vector.index(x)
+#             except:
+#                 return False
+#
+#             if lat.count(x) == 0 or lat.count() > 1:
+#                 error_count=+2
+#             else:
+#                 i = lat.index(x)
+#
+#     base_vector = []
+#     i_0 = None
+#     #for lat in state:
+#     for idx, lat in enumerate(state):
+#         i_vector = list(lat)
+#         if idx == 0:
+#             base_vector = list(lat)
+#             try:
+#                 i_0 = base_vector.index(0)
+#             except:
+#                 return False
+#         for i in range(1,len(i_vector)):
+#             if i != i_vector[(i_0+i)%8]:
+#                 return False
+#     return True
+#
+#         return error_count
 
 #problem = MasterballProblem((((5, 1, 4, 6, 7, 0, 3, 2), (0, 5, 3, 7, 6, 1, 2, 4), (0, 6, 7, 1, 4, 3, 5, 2), (4, 5, 3, 2, 0, 6, 7, 1))))
 

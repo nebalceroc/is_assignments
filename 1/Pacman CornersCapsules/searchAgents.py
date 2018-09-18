@@ -113,6 +113,7 @@ class SearchAgent(Agent):
         starttime = time.time()
         problem = self.searchType(state) # Makes a new search problem
         self.actions  = self.searchFunction(problem) # Find a path
+        print(self.actions)
         totalCost = problem.getCostOfActions(self.actions)
         print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
         if '_expanded' in dir(problem): print('Search nodes expanded: %d' % problem._expanded)
@@ -551,24 +552,39 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         startingGameState.getFood()
         startingGameState.getPacmanPosition()
         """
-        util.raiseNotDefined()
-
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add your code here
-        util.raiseNotDefined()
+        self.capsules = startingGameState.getCapsules()
+        self.walls = startingGameState.getWalls()
+        self.food = startingGameState.getFood()
+        self.startingPosition = startingGameState.getPacmanPosition()
+
+        self.startState = startingGameState
+        print("CAPS")
+        print(self.capsules)
+        print("WALLS")
+        print(self.walls)
+        print("FOOD")
+        print(self.food)
+        print("POS")
+        print(self.startingPosition)
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        util.raiseNotDefined()
+        return self.startState
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        util.raiseNotDefined()
+        #if state.getNumFood() == 0 and len(state.getCapsules()) == 0:
+        if state.isWin():
+            return True
+        else:
+            return False
 
     def getSuccessors(self, state):
         """
@@ -582,15 +598,23 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         """
 
         successors = []
+        currentPosition = state.getPacmanPosition()
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+            x,y = currentPosition
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            consumeFood = state.getFood()[nextx][nexty]
             #Add your code here
-            util.raiseNotDefined()
+            if not hitsWall:
+                if state.getCapsules() > 0 and not consumeFood:
+                    nextState = state.generatePacmanSuccessor(action)
+                    successors.append( ( nextState, action, 1) )
+                elif state.getCapsules() == 0:
+                    nextState = state.generatePacmanSuccessor(action)
+                    successors.append( ( nextState, action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -622,7 +646,21 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    util.raiseNotDefined()
+    totalFood = state.getNumFood()
+    totalCapsules = len(state.getCapsules())
+    pos = state.getPacmanPosition()
+    h = totalFood + totalCapsules
+    _distances = []
+    if totalCapsules > 0:
+        for c in state.getCapsules():
+            _distances.append(abs(pos[0] - c[0]) + abs(pos[1] - c[1]))
+    else:
+        for y in range(state.getFood().height):
+            for x in range(state.getFood().width):
+                if state.getFood()[x][y]:
+                    _distances.append(abs(pos[0] - x+1) + abs(pos[1] - y+1))
+
+    return totalFood + totalCapsules + min(_distances)
 
 
 """

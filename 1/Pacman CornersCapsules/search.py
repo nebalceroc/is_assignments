@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -16,8 +16,34 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
-
+from graphviz import Graph, Digraph
 import util
+
+class search_tree():
+    def __init__(self):
+        self.graph = Digraph(graph_attr = {'size':'9'})
+
+    def addNode(self, name, label):
+        self.graph.node(name, label)
+
+    def addEdge(self, source, action, target):
+        self.graph.edge(source, target, action)
+
+    def getDot(self):
+        return self.graph
+
+def graphDot(g_prob, color):
+    dot = Graph(graph_attr = {'size':'3.5'})
+    for node in g_prob.G:
+        if not node in color:
+            dot.node(node)
+        else:
+            dot.node(node, style = 'filled', color = color[node])
+    for n1 in g_prob.G:
+        for n2 in g_prob.G[n1]:
+            if n1 < n2:
+                dot.edge(n1, n2)
+    return dot
 
 class SearchProblem:
     """
@@ -108,8 +134,25 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def f_cost(item):
+        return item[2] + heuristic(item[0],problem)
+    visited = {}
+    frontier = util.PriorityQueueWithFunction(f_cost)
+    state = problem.getStartState()
+    frontier.push((state, [], 0))
+    tree = search_tree()
+    tree.addNode(str(state)+"[]",str(state))
+    while not frontier.isEmpty():
+        u, actions, path_cost = frontier.pop()
+        if problem.isGoalState(u):
+            return  actions
+        if not u in visited:
+            for v, action, cost in problem.getSuccessors(u):
+                tree.addNode(str(v) + str(actions+[action]), str(v))
+                tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
+                frontier.push((v, actions + [action], path_cost + cost))
+        visited[u] = 'black'
+    return []
 
 
 # Abbreviations

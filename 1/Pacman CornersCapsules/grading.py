@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -86,6 +86,7 @@ class Grades:
         completedQuestions.add(q)
 
       print '\n### Question %s: %d/%d ###\n' % (q, self.points[q], self.maxes[q])
+
 
 
     print '\nFinished at %d:%02d:%02d' % time.localtime()[3:6]
@@ -279,4 +280,3 @@ class Counter(dict):
     Returns the sum of counts for all keys.
     """
     return sum(self.values())
-

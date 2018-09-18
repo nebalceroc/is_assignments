@@ -144,6 +144,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     tree.addNode(str(state)+"[]",str(state))
     while not frontier.isEmpty():
         u, actions, path_cost = frontier.pop()
+        #print(u)
         if problem.isGoalState(u):
             return  actions
         if not u in visited:

@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -702,7 +702,7 @@ class CornerHeuristicSanity(testClasses.TestCase):
         for succ in succs:
             h1 = searchAgents.cornersHeuristic(succ[0], problem)
             if h0 - h1 > 1:
-                grades.addMessage('FAIL: inconsistent heuristic')
+                grades.addMessage('FAIL: inconsistent heuristic2')
                 return False
         heuristic_cost = searchAgents.cornersHeuristic(start_state, problem)
         true_cost = float(solutionDict['cost'])
@@ -712,7 +712,7 @@ class CornerHeuristicSanity(testClasses.TestCase):
             return False
         # cornerAdmissible
         if heuristic_cost > true_cost:
-            grades.addMessage('FAIL: Inadmissible heuristic')
+            grades.addMessage('FAIL: Inadmissible heuristic2')
             return False
         path = solutionDict['path'].split()
         states = followPath(path, problem)
@@ -724,7 +724,7 @@ class CornerHeuristicSanity(testClasses.TestCase):
             h1 = heuristics[i+1]
             # cornerConsistencyB
             if h0 - h1 > 1:
-                grades.addMessage('FAIL: inconsistent heuristic')
+                grades.addMessage('FAIL: inconsistent heuristic3')
                 return False
             # cornerPosH
             if h0 < 0 or h1 <0:
@@ -777,17 +777,19 @@ class CornerHeuristicPacman(testClasses.TestCase):
         problem = searchAgents.CornersProblem(game_state)
         start_state = problem.getStartState()
         if searchAgents.cornersHeuristic(start_state, problem) > true_cost:
-            grades.addMessage('FAIL: Inadmissible heuristic')
+            import pdb; pdb.set_trace()
+            grades.addMessage('FAIL: Inadmissible heuristic4')
             return False
         path = search.astar(problem, searchAgents.cornersHeuristic)
         print "path:", path
         print "path length:", len(path)
         cost = problem.getCostOfActions(path)
         if cost > true_cost:
-            grades.addMessage('FAIL: Inconsistent heuristic')
+            import pdb; pdb.set_trace()
+            grades.addMessage('FAIL: Inconsistent heuristic4')
             return False
         expanded = problem._expanded
-        
+
         points = 0
         for threshold in thresholds:
             if expanded <= threshold:
@@ -819,7 +821,7 @@ class CornerHeuristicPacman(testClasses.TestCase):
         handle.write('thresholds: "2000 1600 1200"\n')
         handle.close()
         return True
-        
+
 
 class CornerAndCapsulesHeuristicSanity(testClasses.TestCase):
 
@@ -841,17 +843,20 @@ class CornerAndCapsulesHeuristicSanity(testClasses.TestCase):
         for succ in succs:
             h1 = searchAgents.cornersAndCapsulesHeuristic(succ[0], problem)
             if h0 - h1 > 1:
-                grades.addMessage('FAIL: inconsistent heuristic')
+                grades.addMessage('FAIL: inconsistent heuristic5')
+                import pdb; pdb.set_trace()
                 return False
         heuristic_cost = searchAgents.cornersAndCapsulesHeuristic(start_state, problem)
         true_cost = float(solutionDict['cost'])
         # cornerNontrivial
         if heuristic_cost == 0:
             grades.addMessage('FAIL: must use non-trivial heuristic')
+            import pdb; pdb.set_trace()
             return False
         # cornerAdmissible
         if heuristic_cost > true_cost:
-            grades.addMessage('FAIL: Inadmissible heuristic')
+            grades.addMessage('FAIL: Inadmissible heuristic5')
+            import pdb; pdb.set_trace()
             return False
         path = solutionDict['path'].split()
         states = followPath(path, problem)
@@ -863,17 +868,21 @@ class CornerAndCapsulesHeuristicSanity(testClasses.TestCase):
             h1 = heuristics[i+1]
             # cornerConsistencyB
             if h0 - h1 > 1:
-                grades.addMessage('FAIL: inconsistent heuristic')
+                grades.addMessage('FAIL: inconsistent heuristic6')
+                import pdb; pdb.set_trace()
                 return False
             # cornerPosH
             if h0 < 0 or h1 <0:
                 grades.addMessage('FAIL: non-positive heuristic')
+                import pdb; pdb.set_trace()
                 return False
         # cornerGoalH
         if heuristics[len(heuristics) - 1] != 0:
             grades.addMessage('FAIL: heuristic non-zero at goal')
+            import pdb; pdb.set_trace()
             return False
         grades.addMessage('PASS: heuristic value less than true cost at start state')
+        import pdb; pdb.set_trace()
         return True
 
     def writeSolution(self, moduleDict, filePath):
@@ -895,7 +904,7 @@ class CornerAndCapsulesHeuristicSanity(testClasses.TestCase):
         handle.write('path: """\n%s\n"""\n' % wrap_solution(solution))
         handle.close()
         return True
-        
+
 
 class CornerAndCapsulesHeuristicPacman(testClasses.TestCase):
 
@@ -915,17 +924,17 @@ class CornerAndCapsulesHeuristicPacman(testClasses.TestCase):
         problem = searchAgents.CornersAndCapsulesProblem(game_state)
         start_state = problem.getStartState()
         if searchAgents.cornersAndCapsulesHeuristic(start_state, problem) > true_cost:
-            grades.addMessage('FAIL: Inadmissible heuristic')
+            grades.addMessage('FAIL: Inadmissible heuristic1')
             return False
         path = search.astar(problem, searchAgents.cornersAndCapsulesHeuristic)
         print "path:", path
         print "path length:", len(path)
         cost = problem.getCostOfActions(path)
         if cost > true_cost:
-            grades.addMessage('FAIL: Inconsistent heuristic')
+            grades.addMessage('FAIL: Inconsistent heuristic1')
             return False
         expanded = problem._expanded
-        
+
         points = 0
         for threshold in thresholds:
             if expanded <= threshold:
@@ -957,5 +966,3 @@ class CornerAndCapsulesHeuristicPacman(testClasses.TestCase):
         handle.write('thresholds: "2000 1600 1200"\n')
         handle.close()
         return True
-        
-        

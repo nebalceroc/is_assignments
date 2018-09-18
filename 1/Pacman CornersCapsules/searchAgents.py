@@ -609,10 +609,10 @@ class CornersAndCapsulesProblem(search.SearchProblem):
             consumeFood = state.getFood()[nextx][nexty]
             #Add your code here
             if not hitsWall:
-                if state.getCapsules() > 0 and not consumeFood:
+                if len(state.getCapsules()) > 0 and not consumeFood:
                     nextState = state.generatePacmanSuccessor(action)
                     successors.append( ( nextState, action, 1) )
-                elif state.getCapsules() == 0:
+                elif len(state.getCapsules()) == 0:
                     nextState = state.generatePacmanSuccessor(action)
                     successors.append( ( nextState, action, 1) )
 
@@ -646,21 +646,62 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    def getMinVec(x1,y1,x2,y2):
+        xs = [x1,x2]
+        ys = [y1,y2]
+        v = [0,0,0,0]
+        i=0
+        for x in xs:
+            for y in range(min(ys),max(ys)+1):
+                if state.getWalls()[x][y]:
+                    v[i] += 2
+                else:
+                    v[i] += 1
+            i+=1
+        i=0
+        for y in ys:
+            for x in range(min(xs),max(xs)+1):
+                if state.getWalls()[x][y]:
+                    v[i+2] += 2
+                else:
+                    v[i+2] += 1
+            i+=1
+        return min([v[0]+v[3],v[1]+v[2]])
+
+
+
+
     totalFood = state.getNumFood()
     totalCapsules = len(state.getCapsules())
     pos = state.getPacmanPosition()
     h = totalFood + totalCapsules
     _distances = []
+    d = 0
+    print(state)
     if totalCapsules > 0:
+        #i_pos = list(pos)
         for c in state.getCapsules():
-            _distances.append(abs(pos[0] - c[0]) + abs(pos[1] - c[1]))
+            #d =+ abs(i_pos[0] - c[0]) + abs(i_pos[1] - c[1])
+            #i_pos = list(c)
+
+            _distances.append((abs(pos[0] - c[0]) + abs(pos[1] - c[1])))
+            #_distances.append(getMinVec(pos[0],pos[1],c[0],c[1]))
     else:
+        #i_pos = list(pos)
         for y in range(state.getFood().height):
             for x in range(state.getFood().width):
                 if state.getFood()[x][y]:
-                    _distances.append(abs(pos[0] - x+1) + abs(pos[1] - y+1))
-
-    return totalFood + totalCapsules + min(_distances)
+                    #d =+ abs(i_pos[0] - x) + abs(i_pos[1] - y)
+                    #i_pos = [x,y]
+                    _distances.append(abs(pos[0] - x) + abs(pos[1] - y))
+                    #_distances.append(getMinVec(pos[0],pos[1],x,y))
+    try:
+        #return totalFood + totalCapsules + min(_distances)*len(_distances)
+        print("D")
+        print(_distances)
+        return sum(_distances) + totalFood + totalCapsules
+    except:
+        return totalFood + totalCapsules
 
 
 """

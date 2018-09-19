@@ -57,17 +57,22 @@ class MasterballProblem(search.SearchProblem):
         ### your code here ###
         base_vector = []
         i_0 = None
-        #for lat in state:
+        # for lat in state:
+        # for idx, lat in enumerate(state):
+        #     i_vector = list(lat)
+        #     if idx == 0:
+        #         base_vector = list(lat)
+        #         try:
+        #             i_0 = base_vector.index(0)
+        #         except:
+        #             return False
+        #     for i in range(1,len(i_vector)):
+        #         if i != i_vector[(i_0+i)%8]:
+        #             return False
         for idx, lat in enumerate(state):
             i_vector = list(lat)
-            if idx == 0:
-                base_vector = list(lat)
-                try:
-                    i_0 = base_vector.index(0)
-                except:
-                    return False
             for i in range(1,len(i_vector)):
-                if i != i_vector[(i_0+i)%8]:
+                if i != i_vector[i]:
                     return False
         return True
 
@@ -194,20 +199,22 @@ def iterativeDeepeningSearch(problem):
         frontier = util.Queue()
         state = problem.getStartState()
         frontier.push((state, [], 0))
+        generated_nodes = 0
         tree = search_tree()
         tree.addNode(str(state)+"[]",str(state))
         while not frontier.isEmpty():
             u, actions, path_cost = frontier.pop()
             if problem.isGoalState(u):
-                return  actions, tree
+                return  actions, tree, generated_nodes
             if not u in visited:
                 for v, action, cost in problem.getSuccessors(u):
                     tree.addNode(str(v) + str(actions+[action]), str(v))
                     tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
                     if path_cost < depth:
                         frontier.push((v, actions + [action], path_cost + cost))
+                        generated_nodes+=1
             visited[u] = 'black'
-    return [], tree
+    return [], tree, generated_nodes
 
 def aStarSearch(problem, heuristic):
     def f_cost(item):
@@ -216,19 +223,35 @@ def aStarSearch(problem, heuristic):
     frontier = util.PriorityQueueWithFunction(f_cost)
     state = problem.getStartState()
     frontier.push((state, [], 0))
+    generated_nodes = 0
     tree = search_tree()
     tree.addNode(str(state)+"[]",str(state))
     while not frontier.isEmpty():
         u, actions, path_cost = frontier.pop()
         if problem.isGoalState(u):
-            return  actions, tree
+            return  actions, tree, generated_nodes
         if not u in visited:
             for v, action, cost in problem.getSuccessors(u):
                 tree.addNode(str(v) + str(actions+[action]), str(v))
                 tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
                 frontier.push((v, actions + [action], path_cost + cost))
+                generated_nodes+=1
         visited[u] = 'black'
-    return [], tree
+    return [], tree, generated_nodes
+
+# def myHeuristic(state):
+#     ### your code here ###
+#     error_count = 0
+#     # for lat in state:
+#     #     i = 0
+#     #     for ipos in lat:
+#     #         if ipos != i:
+#     #             error_count+=1
+#     #         i+=1
+#     for i in range(8):
+#         r = [state[0][i],state[1][i],state[2][i],state[3][i]]
+#         error_count += len(list(set(r)))
+#     return error_count
 
 def myHeuristic(state):
     ### your code here ###
@@ -239,23 +262,48 @@ def myHeuristic(state):
             if ipos != i:
                 error_count+=1
             i+=1
+    for i in range(8):
+        r = [state[0][i],state[1][i],state[2][i],state[3][i]]
+        error_count += len(list(set(r)))-1
     return error_count
 
-# def myHeuristic2(state):
-#     ### your code here ###
+def myHeuristic2(state):
+    ### your code here ###
+    error_count = 0
+    # for lat in state:
+    #     i = 0
+    #     for ipos in lat:
+    #         if ipos != i:
+    #             error_count+=1
+    #         i+=1
+    for i in range(8):
+        r = [state[0][i],state[1][i],state[2][i],state[3][i]]
+        v = len(list(set(r)))
+        if v > 1:
+            error_count += v-1
+        elif state[0][i] != i:
+            error_count += 1
+    return error_count
+
+# def myHeuristic(state):
+#     base_vector = []
+#     i_0 = None
+#     i_i = None
 #     error_count = 0
-#
 #     for idx, lat in enumerate(state):
-#         for x in range(8):
-#             try:
-#                 i_x = base_vector.index(x)
-#             except:
-#                 return False
+#         base_vector = list(lat)
+#         try:
+#             i_0 = base_vector.index(0)
+#             break
+#         except:
+#             error_count =+ 2
+#     for idx, lat in enumerate(state):
+#         i_vector = list(lat)
+#         for i in range(len(i_vector)):
+#             if i != i_vector[(i_0+i)%8]:
+#                 error_count += 1
 #
-#             if lat.count(x) == 0 or lat.count() > 1:
-#                 error_count=+2
-#             else:
-#                 i = lat.index(x)
+#     return error_count
 #
 #     base_vector = []
 #     i_0 = None

@@ -925,6 +925,7 @@ class CornerAndCapsulesHeuristicPacman(testClasses.TestCase):
         start_state = problem.getStartState()
         if searchAgents.cornersAndCapsulesHeuristic(start_state, problem) > true_cost:
             grades.addMessage('FAIL: Inadmissible heuristic1')
+            import pdb; pdb.set_trace()
             return False
         path = search.astar(problem, searchAgents.cornersAndCapsulesHeuristic)
         print "path:", path
@@ -932,6 +933,7 @@ class CornerAndCapsulesHeuristicPacman(testClasses.TestCase):
         cost = problem.getCostOfActions(path)
         if cost > true_cost:
             grades.addMessage('FAIL: Inconsistent heuristic1')
+            import pdb; pdb.set_trace()
             return False
         expanded = problem._expanded
 

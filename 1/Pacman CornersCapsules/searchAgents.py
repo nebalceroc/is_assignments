@@ -560,14 +560,14 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
 
         self.startState = startingGameState
-        print("CAPS")
-        print(self.capsules)
-        print("WALLS")
-        print(self.walls)
-        print("FOOD")
-        print(self.food)
-        print("POS")
-        print(self.startingPosition)
+        #print("CAPS")
+        #print(self.capsules)
+        #print("WALLS")
+        #print(self.walls)
+        #print("FOOD")
+        #print(self.food)
+        #print("POS")
+        #print(self.startingPosition)
 
     def getStartState(self):
         """
@@ -577,6 +577,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         return self.startState
 
     def isGoalState(self, state):
+        print(state)
         """
         Returns whether this search state is a goal state of the problem.
         """
@@ -632,6 +633,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+prev = {}
 
 def cornersAndCapsulesHeuristic(state, problem):
     """
@@ -646,63 +648,55 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    def getMinVec(x1,y1,x2,y2):
-        xs = [x1,x2]
-        ys = [y1,y2]
-        v = [0,0,0,0]
-        i=0
-        for x in xs:
-            for y in range(min(ys),max(ys)+1):
-                if state.getWalls()[x][y]:
-                    v[i] += 2
-                else:
-                    v[i] += 1
-            i+=1
-        i=0
-        for y in ys:
-            for x in range(min(xs),max(xs)+1):
-                if state.getWalls()[x][y]:
-                    v[i+2] += 2
-                else:
-                    v[i+2] += 1
-            i+=1
-        return min([v[0]+v[3],v[1]+v[2]])
 
-
-
-
-    totalFood = state.getNumFood()
-    totalCapsules = len(state.getCapsules())
+    food = state.getFood()
+    food_arr = food.asList()
+    capsules_arr = state.getCapsules()
+    capsules_number = len(capsules_arr)
+    food_number = len(food_arr)
     pos = state.getPacmanPosition()
-    h = totalFood + totalCapsules
-    _distances = []
-    d = 0
-    print(state)
-    if totalCapsules > 0:
-        #i_pos = list(pos)
-        for c in state.getCapsules():
-            #d =+ abs(i_pos[0] - c[0]) + abs(i_pos[1] - c[1])
-            #i_pos = list(c)
-
-            _distances.append((abs(pos[0] - c[0]) + abs(pos[1] - c[1])))
-            #_distances.append(getMinVec(pos[0],pos[1],c[0],c[1]))
-    else:
-        #i_pos = list(pos)
-        for y in range(state.getFood().height):
-            for x in range(state.getFood().width):
-                if state.getFood()[x][y]:
-                    #d =+ abs(i_pos[0] - x) + abs(i_pos[1] - y)
-                    #i_pos = [x,y]
-                    _distances.append(abs(pos[0] - x) + abs(pos[1] - y))
-                    #_distances.append(getMinVec(pos[0],pos[1],x,y))
-    try:
-        #return totalFood + totalCapsules + min(_distances)*len(_distances)
-        print("D")
-        print(_distances)
-        return sum(_distances) + totalFood + totalCapsules
-    except:
-        return totalFood + totalCapsules
-
+    h = 0
+    print("H")
+    print("POS")
+    print(str(pos))
+    if len(capsules_arr) > 0:
+        burned_i = []
+        t = 0
+        while len(burned_i) != capsules_number:
+            dis = []
+            for idx, c in enumerate(capsules_arr):
+                if idx not in burned_i:
+                    d = mazeDistance((pos[0],pos[1]),(c[0],c[1]),state)
+                    dis.append(d)
+                else:
+                    dis.append(99)
+            m = min(dis)
+            t += m
+            b_i = dis.index(m)
+            burned_i.append(b_i)
+            pos = capsules_arr[b_i]
+            print(str(pos))
+        h += t
+    if len(food_arr) > 0:
+        burned_i = []
+        t = 0
+        while len(burned_i) != food_number:
+            dis = []
+            for idx, c in enumerate(food_arr):
+                if idx not in burned_i:
+                    d = mazeDistance((pos[0],pos[1]),(c[0],c[1]),state)
+                    dis.append(d)
+                else:
+                    dis.append(99)
+            m = min(dis)
+            t += m
+            b_i = dis.index(m)
+            burned_i.append(b_i)
+            pos = food_arr[b_i]
+            print(str(pos))
+        h += t
+    print("H2")
+    return h
 
 """
 Test your code with this agent

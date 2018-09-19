@@ -118,7 +118,20 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = {}
+    frontier = util.Queue()
+    state = problem.getStartState()
+    frontier.push((state, [], 0))
+    while not frontier.isEmpty():
+        u, actions, path_cost = frontier.pop()
+        #print(u)
+        if problem.isGoalState(u):
+            return  actions
+        if not u in visited:
+            for v, action, cost in problem.getSuccessors(u):
+                frontier.push((v, actions + [action], path_cost + cost))
+        visited[u] = 'black'
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -140,8 +153,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     frontier = util.PriorityQueueWithFunction(f_cost)
     state = problem.getStartState()
     frontier.push((state, [], 0))
-    tree = search_tree()
-    tree.addNode(str(state)+"[]",str(state))
+    #tree = search_tree()
+    #tree.addNode(str(state)+"[]",str(state))
     while not frontier.isEmpty():
         u, actions, path_cost = frontier.pop()
         #print(u)
@@ -149,8 +162,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             return  actions
         if not u in visited:
             for v, action, cost in problem.getSuccessors(u):
-                tree.addNode(str(v) + str(actions+[action]), str(v))
-                tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
+                #tree.addNode(str(v) + str(actions+[action]), str(v))
+                #tree.addEdge(str(u) + str(actions), str(cost), str(v) + str(actions+[action]))
                 frontier.push((v, actions + [action], path_cost + cost))
         visited[u] = 'black'
     return []
